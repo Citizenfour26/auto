@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="de"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Steel Dart Auto-Scoring</title>
+<style>
+:root{--bg:#050505;--card:#141414;--line:#262626;--tx:#f2f2f2;--mu:#9a9a9a;--red:#e8403c;--grn:#2fbf71;--vio:#9b5cff;--cyn:#1fb5c9;box-sizing:border-box}
+*{box-sizing:inherit;-webkit-tap-highlight-color:transparent}
+body{margin:0;background:#000;color:var(--tx);font:16px/1.3 "Segoe UI",system-ui,sans-serif}
+#app{max-width:480px;margin:0 auto;min-height:100dvh;background:var(--bg);position:relative;padding-top:env(safe-area-inset-top)}
+.scr{display:none;min-height:100dvh;padding:12px 14px 100px}.scr.on{display:block}
+button{font:inherit;color:inherit;border:0;background:none;cursor:pointer}
+.hd{font-family:Impact,"Arial Narrow",sans-serif;letter-spacing:.5px}
+/* Home */
+.top{display:flex;align-items:center;gap:10px;margin-bottom:10px}
+.logo{font:italic 700 40px Georgia,serif;color:#1d7fa0}
+.top small{color:#2a6f8a;font-size:15px;letter-spacing:.5px;flex:1}
+.ib{width:42px;height:42px;border-radius:50%;background:#1d1d1d;display:grid;place-items:center}
+.big{position:relative;display:flex;height:220px;border-radius:22px;overflow:hidden;border:1px solid #3a2a2a;margin-bottom:14px;background:linear-gradient(112deg,#3a0f10 0 52%,#0c2a1a 52%)}
+.big>div{flex:1;padding:16px;position:relative}
+.big h2{margin:0;font-size:44px;color:var(--red)}.big .r h2{color:var(--grn);text-align:right;margin-top:44px}
+.big p{margin:4px 0;color:#ddd;font-size:15px}.big .r p{text-align:right}
+.cir{position:absolute;width:44px;height:44px;border-radius:50%;border:1.5px solid;display:grid;place-items:center;font-size:20px}
+.row2{display:flex;gap:14px;margin-bottom:14px}
+.mini{flex:1;height:150px;border-radius:20px;padding:14px;border:1px solid}
+.mini h3{margin:0 0 8px;font-size:28px}.mini p{margin:0;color:#bbb;font-size:14px;line-height:1.35}
+.list{background:var(--card);border-radius:20px;border:1px solid var(--line)}
+.li{display:flex;align-items:center;gap:14px;padding:14px;width:100%;text-align:left}
+.li+.li{border-top:1px solid var(--line)}
+.li i{width:48px;height:48px;border-radius:12px;display:grid;place-items:center;background:#2a2008;border:1px solid #5a4510;font-style:normal;font-size:22px}
+.li b{display:block}.li span{color:var(--mu);font-size:14px}.li em{margin-left:auto;color:var(--mu);font-style:normal}
+.nav{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:480px;background:#080808;border-top:1px solid #1a1a1a;display:flex;justify-content:space-around;padding:8px 0 calc(8px + env(safe-area-inset-bottom));z-index:5}
+.nav div{text-align:center;color:var(--mu);font-size:13px;padding:6px 18px;border-radius:14px}.nav .a{color:var(--red);background:#2a1212}.nav b{display:block;font-size:20px}
+/* Setup */
+.bar{display:flex;align-items:center;justify-content:space-between;margin-bottom:6px}
+.bar h1{font-size:21px;margin:0;font-weight:600}
+.sec{color:var(--mu);font-weight:600;font-size:15px;margin:10px 4px;display:flex;align-items:center;gap:10px}.sec:after{content:"";flex:1;height:1px;background:var(--line)}
+.panel{background:var(--card);border:1px solid var(--line);border-radius:24px;padding:12px 14px}
+.seg{display:flex;background:#1b1b1b;border-radius:16px;padding:4px}
+.seg button{flex:1;padding:12px 0;border-radius:12px;color:var(--mu);font-size:18px}.seg .a{background:#000;color:#fff;font-weight:700;border:1px solid #333}
+.lbl{color:var(--mu);font-weight:600;font-size:14px;margin:18px 4px 4px}
+.rw{display:flex;align-items:center;justify-content:space-between;padding:16px 4px;border-bottom:1px solid var(--line);font-size:18px}
+.rw:last-child{border:0}
+.st{display:flex;align-items:center;gap:18px}.st button{width:34px;height:34px;border-radius:50%;background:#1c1c1c;font-size:24px}.st b{min-width:18px;text-align:center}
+.note{color:var(--mu);padding:12px 4px;font-size:16px;line-height:1.5;border-bottom:1px solid var(--line)}
+select{background:none;color:var(--tx);border:0;font:inherit;text-align:right;direction:rtl}
+select option{direction:ltr;background:#111}
+.ck{width:46px;height:36px;border-radius:9px;border:2px solid #555;display:grid;place-items:center;font-size:22px}.ck.on{background:var(--red);border-color:var(--red)}
+.pl{display:flex;align-items:center;gap:12px;padding:12px;background:#1c1c1c}.pl+.pl{border-top:1px solid #2a2a2a}
+.pl:first-child{border-radius:14px 14px 0 0}.pl:last-child{border-radius:0 0 14px 14px}
+.bd{width:48px;height:42px;border-radius:9px;display:grid;place-items:center;font-weight:700}
+.pl .nm{flex:1;text-align:left;font-size:18px}
+.mini2{display:flex;justify-content:space-between;color:var(--mu);font-size:14px;padding:12px 4px 2px}
+.cta{position:fixed;bottom:calc(14px + env(safe-area-inset-bottom));left:50%;transform:translateX(-50%);width:calc(100% - 28px);max-width:452px;background:var(--red);color:#fff;font-weight:700;letter-spacing:2px;font-size:19px;padding:20px;border-radius:22px;z-index:5}
+/* Kamera */
+.vwrap{position:relative;background:#000;border-radius:14px;overflow:hidden;line-height:0}
+.vwrap video{width:100%;display:block;max-height:46dvh;object-fit:contain;background:#000}
+.vwrap canvas{position:absolute;inset:0;width:100%;height:100%}
+.msg{padding:12px 4px;color:#ddd;font-size:17px}
+.btn{background:#222;border-radius:14px;padding:14px 18px;font-weight:600}.btn.p{background:var(--red)}
+.btns{display:flex;gap:10px;margin-top:10px}.btns .btn{flex:1}
+/* Spiel */
+.pc{display:flex;align-items:center;gap:12px;background:var(--card);border:2px solid var(--line);border-radius:18px;padding:10px 14px;margin-top:8px}
+.pc.cur{border-color:var(--red);background:#1c1010}
+.pc .sc{font-size:44px;font-weight:800;margin-left:auto}.pc small{color:var(--mu)}
+.darts{display:flex;gap:8px;margin-top:10px}.darts div{flex:1;text-align:center;padding:12px 0;border-radius:12px;background:#1a1a1a;font-size:20px;font-weight:700;color:#555}
+.darts .f{color:#fff;background:#222}.darts .bu{color:var(--red)}
+.toast{position:fixed;top:20px;left:50%;transform:translateX(-50%);background:#222;border:1px solid #444;padding:12px 18px;border-radius:14px;z-index:20;display:none}
+.ov{position:fixed;inset:0;background:#000d;display:none;place-items:center;z-index:30}.ov.on{display:grid}
+.ov div{background:var(--card);padding:28px;border-radius:22px;text-align:center;max-width:320px}
+</style></head><body><div id="app">
+
+<section class="scr on" id="home">
+ <div class="top"><span class="logo">C4</span><small>STEEL DART &nbsp; AUTO-SCORING</small><button class="ib" onclick="T('Benachrichtigungen: keine neuen')">🔔</button><button class="ib" onclick="T('Profil folgt')">👥</button></div>
+ <div class="big">
+  <div onclick="show('setup')"><h2 class="hd">X01</h2><p>Standard-Match - 301, 501, 701</p><span class="cir" style="left:16px;bottom:18px;color:var(--red);border-color:var(--red)">←</span></div>
+  <div class="r" onclick="T('Cricket folgt in einer späteren Version')"><span class="cir" style="right:16px;top:16px;color:var(--grn);border-color:var(--grn)">→</span><h2 class="hd">Cricket</h2><p>Schließe Segmente und übertreffe deinen Gegner</p></div>
+ </div>
+ <div class="row2">
+  <button class="mini" style="background:linear-gradient(160deg,#241046,#0d0814);border-color:#4a2a8a;text-align:left" onclick="T('Partyspiele folgen')"><h3 class="hd" style="color:var(--vio)">Partyspiele</h3><p>Shanghai<br>High/Low<br>Halve-It</p></button>
+  <button class="mini" style="background:linear-gradient(160deg,#0b2d34,#07100f);border-color:#16606c;text-align:left" onclick="T('Training folgt')"><h3 class="hd" style="color:var(--cyn)">Training</h3><p>Checkout-Training<br>Around the World<br>121 Checkout</p></button>
+ </div>
+ <div class="list">
+  <button class="li" onclick="help()"><i>📖</i><div><b>Anleitung</b><span>Aufbau, Licht und Tipps</span></div><em>›</em></button>
+  <button class="li" onclick="T('Einstellungen folgen')"><i style="background:#1d1d1d;border-color:#333">⚙️</i><div><b>Einstellungen</b><span>Passe dein Erlebnis an</span></div><em>›</em></button>
+ </div>
+ <div class="nav"><div class="a"><b>◎</b>Spielen</div><div><b>◷</b>Meine Spiele</div><div><b>☺</b>Mein Profil</div></div>
+</section>
+
+<section class="scr" id="setup">
+ <div class="bar"><button onclick="show('home')" style="font-size:26px;padding:6px">‹</button><h1>X01-Spieleinrichtung</h1><button class="ib" style="width:30px;height:30px;background:#fff;color:#000;font-weight:800" onclick="help()">?</button></div>
+ <div class="sec">SPIELEINSTELLUNGEN</div>
+ <div class="panel">
+  <div class="seg" id="sv"></div>
+  <div class="lbl">MATCH-FORMAT</div>
+  <div class="rw">Sätze zum Sieg <div class="st"><button onclick="stp('sets',-1)">−</button><b id="v_sets"></b><button onclick="stp('sets',1)">+</button></div></div>
+  <div class="rw">Legs zum Sieg <div class="st"><button onclick="stp('legs',-1)">−</button><b id="v_legs"></b><button onclick="stp('legs',1)">+</button></div></div>
+  <div class="note" id="nt"></div>
+  <div class="rw">Erster Wurf eines Legs <select onchange="S.first=this.value"><option value="alt">Abwechselnd</option><option value="p1">Spieler 1</option></select></div>
+  <div class="rw">Spielerreihenfolge <select onchange="S.order=this.value"><option value="list">Wie aufgelistet</option><option value="rand">Zufällig</option></select></div>
+  <div class="lbl">REGELN</div>
+  <div class="rw">Double In <div class="ck on" id="k_dIn" onclick="tg('dIn')">✓</div></div>
+  <div class="rw">Double Out <div class="ck" id="k_dOut" onclick="tg('dOut')"></div></div>
+ </div>
+ <div class="sec">SPIELER</div>
+ <div class="panel" style="padding:8px">
+  <div class="seg" id="mode"><button class="a" onclick="mode(1)">Einzel</button><button onclick="mode(2)">Doppel</button></div>
+  <div style="margin-top:8px" id="pls"></div>
+  <div class="mini2"><button onclick="edit=!edit;rp()">✎ Spieler bearbeiten</button><button onclick="addP()">+ Spieler hinzufügen</button></div>
+ </div>
+ <button class="cta" onclick="toCal()">SPIELEN &nbsp;›</button>
+</section>
+
+<section class="scr" id="cal">
+ <div class="bar"><button onclick="stopCam();show('setup')" style="font-size:26px;padding:6px">‹</button><h1>Kamera kalibrieren</h1><span style="width:30px"></span></div>
+ <div id="calbox"></div>
+ <div class="msg" id="calmsg"></div>
+ <div class="btns"><button class="btn" onclick="calReset()">Zurücksetzen</button><button class="btn p" id="calok" onclick="startGame()" disabled style="opacity:.4">Fertig</button></div>
+ <p class="msg" style="color:var(--mu);font-size:14px">Scheibe mit der 20 oben ausrichten. Tippe nacheinander auf die vier Drähte am äußeren Rand des Doppelrings: 20|1, 6|10, 3|19, 11|14.</p>
+</section>
+
+<section class="scr" id="game">
+ <div id="gamebox"></div>
+ <div class="msg" id="gst">Warte auf Dart…</div>
+ <div class="darts" id="dd"></div>
+ <div id="gpl"></div>
+ <div class="btns"><button class="btn" onclick="undo()">↶ Rückgängig</button><button class="btn p" id="nx" onclick="next()">Weiter</button></div>
+ <div class="btns"><button class="btn" onclick="if(confirm('Spiel beenden?')){stopCam();show('home')}">Beenden</button></div>
+ <p class="msg" style="color:var(--mu);font-size:14px">Tipp: Wurde ein Dart falsch erkannt, „Rückgängig“ drücken und die Einstichstelle im Kamerabild antippen.</p>
+</section>
+
+<div class="ov" id="ov"><div><h2 id="ovt" class="hd"></h2><button class="btn p" onclick="ov.classList.remove('on');stopCam();show('home')">Zum Start</button></div></div>
+<div class="toast" id="toast"></div>
+<video id="vid" playsinline muted autoplay style="display:none"></video>
+<div class="vwrap" id="vw" style="display:none"><canvas id="ovc"></canvas></div>
+</div>
+<script>
+const $=id=>document.getElementById(id),ov=$('ov');
+const S={start:501,sets:2,legs:3,first:'alt',order:'list',dIn:true,dOut:false};
+let P=['Spieler 1','Player 2'],edit=false,dbl=false;
+const COL=['#e8403c','#3b8be8','#2fbf71','#e8a23b'];
+function T(t){const e=$('toast');e.textContent=t;e.style.display='block';clearTimeout(T.t);T.t=setTimeout(()=>e.style.display='none',2200)}
+function show(id){document.querySelectorAll('.scr').forEach(s=>s.classList.toggle('on',s.id==id));scrollTo(0,0)}
+function help(){alert('Kamera seitlich/frontal so befestigen, dass die ganze Scheibe sichtbar und gleichmäßig beleuchtet ist. Handy nach der Kalibrierung nicht mehr bewegen. Nach jeder Aufnahme-Runde die Darts ziehen und „Weiter“ drücken.')}
+/* Setup */
+function rs(){ $('sv').innerHTML=[301,501,701,1001].map(n=>`<button class="${n==S.start?'a':''}" onclick="S.start=${n};rs()">${n}</button>`).join('');
+ $('v_sets').textContent=S.sets;$('v_legs').textContent=S.legs;
+ $('nt').innerHTML=`Sätze: gespielt wird bis ${S.sets}, Best of ${2*S.sets-1}<br>Gespielt wird bis ${S.legs}, Best of ${2*S.legs-1}`;
+ ['dIn','dOut'].forEach(k=>{$('k_'+k).className='ck'+(S[k]?' on':'');$('k_'+k).textContent=S[k]?'✓':''})}
+function stp(k,d){S[k]=Math.max(1,Math.min(9,S[k]+d));rs()}
+function tg(k){S[k]=!S[k];rs()}
+function rp(){$('pls').innerHTML=P.map((n,i)=>`<div class="pl"><div class="bd" style="background:${COL[i]}">P${i+1}</div><button class="nm" onclick="ren(${i})">${n}</button>${edit&&P.length>(dbl?2:1)?`<button onclick="P.splice(${i},1);rp()">✕</button>`:'⋮⋮'}</div>`).join('')}
+function ren(i){const n=prompt('Name',P[i]);if(n)P[i]=n.slice(0,14);rp()}
+function addP(){if(P.length<4){P.push('Spieler '+(P.length+1));rp()}else T('Maximal 4 Spieler')}
+function mode(m){dbl=m==2;document.querySelectorAll('#mode button').forEach((b,i)=>b.classList.toggle('a',i==m-1));
+ P=dbl?['Team 1','Team 2']:['Spieler 1','Player 2'];rp()}
+/* Mathe */
+const ORDER=[20,1,18,4,13,6,10,15,2,17,3,19,7,16,8,11,14,9,12,5],R=170;
+function solveH(s,d){const A=[];for(let i=0;i<4;i++){const[x,y]=s[i],[u,v]=d[i];A.push([x,y,1,0,0,0,-u*x,-u*y,u],[0,0,0,x,y,1,-v*x,-v*y,v])}
+ for(let c=0;c<8;c++){let m=c;for(let r=c+1;r<8;r++)if(Math.abs(A[r][c])>Math.abs(A[m][c]))m=r;[A[c],A[m]]=[A[m],A[c]];
+  for(let r=0;r<8;r++)if(r!=c){const f=A[r][c]/A[c][c];for(let k=c;k<9;k++)A[r][k]-=f*A[c][k]}}
+ return A.map((r,i)=>r[8]/r[i]).concat(1)}
+function ap(H,x,y){const w=H[6]*x+H[7]*y+H[8];return[(H[0]*x+H[1]*y+H[2])/w,(H[3]*x+H[4]*y+H[5])/w]}
+function inv3(m){const[a,b,c,d,e,f,g,h,i]=m,A=e*i-f*h,B=-(d*i-f*g),C=d*h-e*g,D=a*A+b*B+c*C;
+ return[A,-(b*i-c*h),b*f-c*e,B,a*i-c*g,-(a*f-c*d),C,-(a*h-b*g),a*e-b*d].map(v=>v/D)}
+function score(x,y){const r=Math.hypot(x,y);if(r<=6.35)return{m:2,n:25,p:50,l:'Bull'};if(r<=15.9)return{m:1,n:25,p:25,l:'25'};
+ if(r>R)return{m:0,n:0,p:0,l:'Miss'};const a=(Math.atan2(x,-y)*180/Math.PI+360)%360,n=ORDER[Math.floor(((a+9)%360)/18)];
+ const m=r>=162?2:(r>=99&&r<=107)?3:1;return{m,n,p:m*n,l:(m==3?'T':m==2?'D':'')+n}}
+/* Kamera */
+let W=320,H=240,cx,Hi,Hb,pts=[],base,prev,mask,timer,stable=0,stream;
+const vid=$('vid'),vw=$('vw'),ovc=$('ovc'),oc=ovc.getContext('2d'),cv=document.createElement('canvas'),cc=cv.getContext('2d',{willReadFrequently:true});
+async function startCam(host){
+ if(!stream){try{stream=await navigator.mediaDevices.getUserMedia({video:{facingMode:'environment',width:{ideal:1280}},audio:false})}
+  catch(e){$('calmsg').textContent='Kamera nicht verfügbar ('+e.name+'). Seite über https oder localhost öffnen und Zugriff erlauben.';return false}
+  vid.srcObject=stream;await vid.play().catch(()=>{});await new Promise(r=>vid.videoWidth?r():vid.onloadedmetadata=r);
+  W=320;H=Math.round(320*vid.videoHeight/vid.videoWidth);ovc.width=cv.width=W;ovc.height=cv.height=H}
+ vid.style.display='block';vw.style.display='block';vw.insertBefore(vid,ovc);host.appendChild(vw);return true}
+function stopCam(){clearInterval(timer);timer=0;if(stream){stream.getTracks().forEach(t=>t.stop());stream=null}}
+function toCal(){show('cal');pts=[];Hi=null;calUi();startCam($('calbox')).then(ok=>ok&&calUi())}
+function calUi(){const L=['20|1','6|10','3|19','11|14'];
+ $('calmsg').textContent=pts.length<4?`Punkt ${pts.length+1} von 4: Draht ${L[pts.length]} am äußeren Doppelring antippen`:'Prüfe, ob das Raster auf der Scheibe liegt. Sonst zurücksetzen.';
+ const ok=pts.length==4;$('calok').disabled=!ok;$('calok').style.opacity=ok?1:.4;draw()}
+function calReset(){pts=[];Hi=null;calUi()}
+ovc.addEventListener('click',e=>{const r=ovc.getBoundingClientRect(),x=(e.clientX-r.left)/r.width*W,y=(e.clientY-r.top)/r.height*H;
+ if($('cal').classList.contains('on')){if(pts.length<4){pts.push([x,y]);if(pts.length==4){const b=[9,99,189,279].map(a=>[R*Math.sin(a*Math.PI/180),-R*Math.cos(a*Math.PI/180)]);
+   Hi=solveH(pts,b);Hb=inv3(Hi)}calUi()}}
+ else if(G&&!G.await&&!G.over){const[bx,by]=ap(Hi,x,y);addDart(score(bx,by),bx,by)}});
+function draw(){oc.clearRect(0,0,W,H);oc.lineWidth=1.2;
+ pts.forEach(([x,y])=>{oc.strokeStyle='#ff0';oc.beginPath();oc.moveTo(x-6,y);oc.lineTo(x+6,y);oc.moveTo(x,y-6);oc.lineTo(x,y+6);oc.stroke()});
+ if(!Hb)return;oc.strokeStyle='rgba(0,255,255,.8)';
+ [6.35,15.9,99,107,162,170].forEach(r=>{oc.beginPath();for(let a=0;a<=360;a+=4){const[x,y]=ap(Hb,r*Math.sin(a*Math.PI/180),-r*Math.cos(a*Math.PI/180));a?oc.lineTo(x,y):oc.moveTo(x,y)}oc.stroke()});
+ oc.beginPath();for(let k=0;k<20;k++){const a=(9+18*k)*Math.PI/180;let[x,y]=ap(Hb,15.9*Math.sin(a),-15.9*Math.cos(a));oc.moveTo(x,y);[x,y]=ap(Hb,R*Math.sin(a),-R*Math.cos(a));oc.lineTo(x,y)}oc.stroke();
+ if(G)G.pl.forEach(()=>0),(G?G.darts:[]).forEach(d=>{const[x,y]=ap(Hb,d.x,d.y);oc.fillStyle='#e8403c';oc.beginPath();oc.arc(x,y,4,0,7);oc.fill()})}
+/* Spiel */
+let G=null,hist=[];
+function startGame(){let names=P.slice();if(S.order=='rand')names.sort(()=>Math.random()-.5);
+ mask=new Uint8Array(W*H);for(let y=0;y<H;y++)for(let x=0;x<W;x++){const[a,b]=ap(Hi,x,y);mask[y*W+x]=Math.hypot(a,b)<=175?1:0}
+ G={pl:names.map((n,i)=>({n,c:COL[P.indexOf(n)],score:S.start,sets:0,legs:0,in:!S.dIn})),cur:0,starter:0,darts:[],ts:S.start,tin:!S.dIn,await:false,pending:null,over:null};
+ hist=[];show('game');$('gamebox').appendChild(vw);render();grab(true);clearInterval(timer);timer=setInterval(tick,200)}
+function snap(){hist.push(JSON.stringify(G))}
+function undo(){if(hist.length&&!G.over){G=JSON.parse(hist.pop());render();grab(true)}}
+function addDart(s,x,y){snap();const p=G.pl[G.cur];let bust=false,pts=s.p;
+ if(!p.in){if(s.m==2)p.in=true;else pts=0}
+ const ns=p.score-pts;
+ if(ns<0||(S.dOut&&(ns==1||(ns==0&&s.m!=2))))bust=true;
+ G.darts.push({l:s.l,x,y,bust});
+ if(bust){p.score=G.ts;p.in=G.tin;G.await=true;T('Bust!')}
+ else{p.score=ns;if(ns==0)legWin(p);else if(G.darts.length==3)G.await=true}
+ render();grab(true)}
+function legWin(p){G.await=true;p.legs++;
+ if(p.legs>=S.legs){p.sets++;G.pl.forEach(q=>q.legs=0);if(p.sets>=S.sets){G.over=p.n;G.pending='match'}else G.pending='leg'}else G.pending='leg'}
+function next(){if(!G||G.over&&!G.pending)return;
+ if(G.pending=='match'){$('ovt').textContent=G.over+' gewinnt das Match!';ov.classList.add('on');return}
+ snap();
+ if(G.pending=='leg'){G.starter=S.first=='alt'?(G.starter+1)%G.pl.length:0;G.pl.forEach(q=>{q.score=S.start;q.in=!S.dIn});G.cur=G.starter;G.pending=null}
+ else G.cur=(G.cur+1)%G.pl.length;
+ const p=G.pl[G.cur];G.ts=p.score;G.tin=p.in;G.darts=[];G.await=false;render();grab(true)}
+function render(){$('gpl').innerHTML=G.pl.map((p,i)=>`<div class="pc ${i==G.cur?'cur':''}"><div class="bd" style="background:${p.c};width:40px;height:34px">P${i+1}</div><div><b>${p.n}</b><br><small>Sätze ${p.sets} · Legs ${p.legs}${!p.in?' · Double In offen':''}</small></div><div class="sc">${p.score}</div></div>`).join('');
+ $('dd').innerHTML=[0,1,2].map(i=>{const d=G.darts[i];return`<div class="${d?'f':''} ${d&&d.bust?'bu':''}">${d?d.l:'–'}</div>`}).join('');
+ $('nx').textContent=G.pending=='leg'?'Nächstes Leg':G.pending=='match'?'Ergebnis':'Weiter';
+ $('nx').style.opacity=G.await?1:.5;draw()}
+function grab(reset){cc.drawImage(vid,0,0,W,H);const d=cc.getImageData(0,0,W,H).data,g=new Uint8Array(W*H);for(let i=0,j=0;j<g.length;i+=4,j++)g[j]=(d[i]+d[i+1]+d[i+2])/3;
+ if(reset){base=g;prev=g;stable=0}return g}
+function tick(){if(!G||!stream)return;const g=grab();let mo=0,ch=0,minY=1e9,list=[];
+ for(let i=0;i<g.length;i++){if(!mask[i])continue;if(Math.abs(g[i]-prev[i])>25)mo++;if(Math.abs(g[i]-base[i])>40){ch++;list.push(i)}}
+ prev=g;stable=mo>40?0:stable+1;
+ const st=$('gst');
+ if(G.await){st.textContent=G.pending?'Leg beendet – Darts ziehen, dann „'+$('nx').textContent+'“':'Darts ziehen, dann „Weiter“';return}
+ if(stable<4){st.textContent=mo>40?'Bewegung erkannt…':st.textContent;return}
+ st.textContent='Warte auf Dart… ('+G.darts.length+'/3)';
+ if(ch<20){base=g;return}
+ if(ch>2500)return;
+ list.sort((a,b)=>(a/W|0)-(b/W|0));const top=list.slice(0,6);
+ const x=top.reduce((s,i)=>s+i%W,0)/top.length,y=top.reduce((s,i)=>s+(i/W|0),0)/top.length;
+ const[bx,by]=ap(Hi,x,y);addDart(score(bx,by),bx,by);base=g}
+rs();rp();
+</script></body></html>
